@@ -14,6 +14,7 @@ import {
    ZoomIn,
 } from "react-scroll-motion";
 import SecondSection from "./SecondSection.js";
+import ThirdSection from "./ThirdSection.js";
 
 const ZoomInScrollOut = batch(StickyIn(), FadeIn(), ZoomIn());
 const FadeUp = batch(Fade(), Move(), Sticky());
@@ -23,6 +24,7 @@ function App() {
       <>
          <FirstSection />
          <SecondSection />
+         <ThirdSection />
       </>
    );
 }
