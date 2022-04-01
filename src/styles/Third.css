@@ -58,13 +58,15 @@
    background: var(--gradient-bar);
 }
 @media screen and (max-width: 940px) {
+   .third-section {
+      height: auto;
+   }
    .items {
       margin: 40px 0;
    }
 }
 @media screen and (max-width: 900px) {
    .third-section {
-      height: auto;
       flex-direction: column;
    }
    .left-item {
