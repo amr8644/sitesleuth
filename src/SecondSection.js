@@ -5,7 +5,6 @@ const SecondSection = () => {
    return (
       <section
          data-aos="fade-right"
-         data-aos-offset="300"
          data-aos-duration="500"
          className="second-section"
       >

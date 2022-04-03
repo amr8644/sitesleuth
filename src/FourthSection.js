@@ -6,7 +6,7 @@ const FourthSection = () => {
    return (
       <section
          data-aos="fade-right"
-         data-aos-offset="500"
+      
          data-aos-duration="500"
          className="fourth-section"
       >

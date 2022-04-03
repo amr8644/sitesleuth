@@ -5,7 +5,6 @@ const LastSection = () => {
    return (
       <section
          data-aos="zoom-out-up"
-         data-aos-offset="300"
          data-aos-duration="500"
          className="last-section"
       >
