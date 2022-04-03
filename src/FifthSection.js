@@ -13,7 +13,12 @@ import Article from "./componets/Article.js";
 
 const FifthSection = () => {
    return (
-      <section className="fifth-section">
+      <section
+         data-aos="fade-left"
+         data-aos-offset="500"
+         data-aos-duration="500"
+         className="fifth-section"
+      >
          <article className="title-container">
             <h2>
                A lot is happening, <br /> We are blogging about it.

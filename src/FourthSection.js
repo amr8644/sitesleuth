@@ -4,7 +4,12 @@ import "./styles/Fourth.css";
 
 const FourthSection = () => {
    return (
-      <section className="fourth-section">
+      <section
+         data-aos="fade-right"
+         data-aos-offset="500"
+         data-aos-duration="500"
+         className="fourth-section"
+      >
          <article className="image-container">
             <img src={MyApps} alt="MyApps" />
          </article>

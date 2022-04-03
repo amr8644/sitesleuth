@@ -3,7 +3,12 @@ import "./styles/Third.css";
 
 const ThirdSection = () => {
    return (
-      <section className="third-section">
+      <section
+         data-aos="fade-left"
+         data-aos-offset="500"
+         data-aos-duration="500"
+         className="third-section"
+      >
          <aside className="left-item">
             <h2>
                The Future is Now and You Just Need To Realize It. Step into

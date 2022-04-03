@@ -3,7 +3,12 @@ import "./styles/Second.css";
 
 const SecondSection = () => {
    return (
-      <section className="second-section">
+      <section
+         data-aos="fade-right"
+         data-aos-offset="500"
+         data-aos-duration="500"
+         className="second-section"
+      >
          <article className="main">
             {/* First Article */}
             <aside className="first">

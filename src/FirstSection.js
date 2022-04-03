@@ -1,5 +1,4 @@
 import React from "react";
-import NavBar from "./componets/NavBar.js";
 import "./styles/FirstSection.css";
 import AI from "./Assets/ai.png";
 import Company from "./componets/Company.js";
@@ -8,8 +7,12 @@ import People from "./Assets/people.png";
 const FirstSection = () => {
    return (
       <>
-         <NavBar />
-         <section className="first-section">
+         <section
+            data-aos="fade-left"
+            data-aos-offset="500"
+            data-aos-duration="500"
+            className="first-section"
+         >
             <article className="text-section">
                <h2>Let’s Build Something amazing with GPT-3 OpenAI</h2>
                <p>
