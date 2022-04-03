@@ -30,7 +30,7 @@
    background-clip: text;
    -webkit-background-clip: text;
    -webkit-text-fill-color: transparent;
-   font-size: 2.5rem;
+   font-size: 3rem;
 }
 .text-container p:first-child {
    font-size: 0.9rem;
@@ -118,5 +118,11 @@
    }
    .btn {
       margin: 10px 0;
+   }
+}
+
+@media screen and (max-width: 425px) {
+   .text-container h3 {
+      font-size: 2.5rem;
    }
 }

@@ -18,6 +18,8 @@ import ThirdSection from "./ThirdSection.js";
 import FourthSection from "./FourthSection.js";
 import SubSection from "./componets/SubSection.js";
 import FifthSection from "./FifthSection.js";
+import LastSection from "./LastSection.js";
+import Footer from "./Footer.js";
 
 const ZoomInScrollOut = batch(StickyIn(), FadeIn(), ZoomIn());
 const FadeUp = batch(Fade(), Move(), Sticky());
@@ -31,6 +33,8 @@ function App() {
          <FourthSection />
          <SubSection />
          <FifthSection />
+         <LastSection />
+         <Footer />
       </>
    );
 }
