@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+    "golang.org/x/net/html"
+  "strings"
 	"net/http"
-	"regexp"
 )
 
 type Data struct {
@@ -19,14 +20,48 @@ type Data struct {
 
 var data Data
 
-func ParseHTMLPage(page string) {
-	regex_scripts := regexp.MustCompile(`<script.*?src="([^"]+)".*?</script>`)
-	submatches := regex_scripts.FindAllStringSubmatch(data.HTML, -1)
+func getAttr(n *html.Node, attr string) string {
+  for _, a := range n.Attr {
+    if a.Key == attr {
+      return a.Val
+    }
+  }
+  return ""
+}
 
-	for _, match := range submatches {
-		fmt.Println(match[1])
+// Iterate DOM nodes
+func iterateNodes(n *html.Node, f func(*html.Node)) {
+  f(n)
+  for c := n.FirstChild; c != nil; c = c.NextSibling {
+    iterateNodes(c, f)
+  }
+}
+
+func ParseHTMLPage(page string) {
+
+
+	// Parse HTML
+	doc, err := html.Parse(strings.NewReader(data.HTML))
+	if err != nil {
+		panic(err)
 	}
-    fmt.Println(data.HTML)
+
+	// Find nodes
+	var meta, scripts []string
+
+	iterateNodes(doc, func(n *html.Node) {
+		if n.Data == "meta" {
+			meta = append(meta, getAttr(n, "content"))
+		}
+		if n.Data == "script" {
+			scripts = append(scripts, getAttr(n, "src"))
+		}
+	})
+
+	// Print results
+	fmt.Println("Meta:", meta)
+	fmt.Println("Scripts:", scripts)
+
 }
 
 func ScrapeURL(response http.Response, value string) {
