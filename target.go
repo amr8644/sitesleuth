@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"golang.org/x/net/html"
 	"io/ioutil"
 	"log"
-    "golang.org/x/net/html"
-  "strings"
 	"net/http"
+	"strings"
 )
 
 type Data struct {
@@ -20,28 +20,11 @@ type Data struct {
 
 var data Data
 
-func getAttr(n *html.Node, attr string) string {
-  for _, a := range n.Attr {
-    if a.Key == attr {
-      return a.Val
-    }
-  }
-  return ""
-}
-
-// Iterate DOM nodes
-func iterateNodes(n *html.Node, f func(*html.Node)) {
-  f(n)
-  for c := n.FirstChild; c != nil; c = c.NextSibling {
-    iterateNodes(c, f)
-  }
-}
-
 func ParseHTMLPage(page string) {
-
 
 	// Parse HTML
 	doc, err := html.Parse(strings.NewReader(data.HTML))
+
 	if err != nil {
 		panic(err)
 	}
@@ -49,19 +32,52 @@ func ParseHTMLPage(page string) {
 	// Find nodes
 	var meta, scripts []string
 
-	iterateNodes(doc, func(n *html.Node) {
+	IterateNodes(doc, func(n *html.Node) {
 		if n.Data == "meta" {
-			meta = append(meta, getAttr(n, "content"))
+			meta = append(meta, GetAttr(n, "content"))
 		}
 		if n.Data == "script" {
-			scripts = append(scripts, getAttr(n, "src"))
+			scripts = append(scripts, GetAttr(n, "src"))
 		}
 	})
 
 	// Print results
-	fmt.Println("Meta:", meta)
-	fmt.Println("Scripts:", scripts)
+	//fmt.Println("Meta:", meta)
+	//fmt.Println("Scripts:", scripts)
+}
 
+func ParseResponse(response http.Response) {
+
+	headers := response.Header
+
+	for k, v := range headers {
+		if k == "Set-Cookie" {
+			data.Cookies = make(map[string]string)
+			data.Cookies[k] = v[0]
+			fmt.Println(k, v)
+		} else {
+			data.Headers = make(map[string][]string)
+			data.Headers[k] = v
+		}
+
+	}
+}
+
+func ParseRequest(response http.Response) {
+
+	headers := response.Header
+
+	for k, v := range headers {
+		if k == "Set-Cookie" {
+			data.Cookies = make(map[string]string)
+			data.Cookies[k] = v[0]
+			fmt.Println(k, v)
+		} else {
+			data.Headers = make(map[string][]string)
+			data.Headers[k] = v
+		}
+
+	}
 }
 
 func ScrapeURL(response http.Response, value string) {
