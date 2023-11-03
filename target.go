@@ -54,7 +54,7 @@ func PrintData() {
 func LinkGrabber(value string) []string {
 
     var links []string
-		res := SendRequests(value)
+	res := SendRequests(value)
 	body, err := ioutil.ReadAll(res.Body)
 
 	doc, err := html.Parse(strings.NewReader(string(body[:])))
@@ -79,7 +79,6 @@ func LinkGrabber(value string) []string {
 	}
 
 	f(doc)
-    
     return links
 }
 
@@ -157,7 +156,7 @@ func ScrapeURL(response http.Response, value string) {
 
 	for k, v := range headers {
 		data.Headers = make(map[string][]string)
-        fmt.Println(k,v)
+        //fmt.Println(k,v)
 		data.Headers[k] = v
 	}
 
@@ -173,6 +172,8 @@ func SendRequests(value string) *http.Response {
 
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", value, nil)
+    request.Header.Set("User-Agent", RandomUserAgents())
+
 	if err != nil {
 		log.Fatalln(err)
 	}

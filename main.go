@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -14,10 +13,10 @@ func main() {
 
 	for _, v := range links {
 		if v[0] == '/' {
-			fmt.Println(v)
+	//		fmt.Println(v)
 		}
 		if strings.Contains(v, tar) {
-			fmt.Println(v)
+		//	fmt.Println(v)
 			response := SendRequests(v)
 			ScrapeURL(*response, v)
 
