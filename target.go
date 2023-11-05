@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"golang.org/x/net/html"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
+
+	"golang.org/x/net/html"
 )
 
 type Data struct {
@@ -28,10 +30,8 @@ func PrintData() {
 
 	fmt.Println("Headers:")
 	for k, v := range data.Headers {
-		if k == "X-Powered-By" {
 
-			fmt.Println("- ", k, ":", v)
-		}
+		fmt.Println("- ", k, ":", v)
 	}
 
 	fmt.Println("Cookies:")
@@ -53,9 +53,9 @@ func PrintData() {
 
 func LinkGrabber(value string) []string {
 
-    var links []string
+	var links []string
 	res := SendRequests(value)
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 
 	doc, err := html.Parse(strings.NewReader(string(body[:])))
 
@@ -68,7 +68,7 @@ func LinkGrabber(value string) []string {
 		if n.Type == html.ElementNode && n.Data == "a" {
 			for _, a := range n.Attr {
 				if a.Key == "href" {
-                    links = append(links, a.Val)
+					links = append(links, a.Val)
 					break
 				}
 			}
@@ -79,7 +79,7 @@ func LinkGrabber(value string) []string {
 	}
 
 	f(doc)
-    return links
+	return links
 }
 
 func ParseHTMLPage(page string) {
@@ -112,7 +112,6 @@ func ParseResponse(response http.Response) {
 		if k == "Set-Cookie" {
 			data.Cookies = make(map[string]string)
 			data.Cookies[k] = v[0]
-			//fmt.Println(k, v)
 		} else {
 			data.Headers = make(map[string][]string)
 			data.Headers[k] = v
@@ -121,10 +120,9 @@ func ParseResponse(response http.Response) {
 	}
 }
 
-func ParseRequest(response http.Response) {
+func ParseRequest(request http.Request) {
 
-	headers := response.Header
-
+	headers := request.Header
 	for k, v := range headers {
 		if k == "Set-Cookie" {
 			data.Cookies = make(map[string]string)
@@ -137,27 +135,33 @@ func ParseRequest(response http.Response) {
 	}
 }
 
-func ScrapeURL(response http.Response, value string) {
+func ScrapeURL(value string) error {
+	response := SendRequests(value)
 	headers := response.Header
 
 	var ct string = response.Header.Get("Content-Type")
 
 	if ct == "" || ct != "text/html" {
 		log.Println("{} response use Content-Type {} but text/html is needed")
+		return errors.New("Invalid Content-Type")
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Fatalln(err)
+		return err
 	}
 
-	data.URL = value
+	//data.URL = value
 	data.HTML = string(body)
 
 	for k, v := range headers {
 		data.Headers = make(map[string][]string)
-        //fmt.Println(k,v)
-		data.Headers[k] = v
+		//fmt.Println(k,v)
+		for _, x := range v {
+
+			data.Headers[k] = append(data.Headers[k], x)
+		}
 	}
 
 	for _, cookie := range response.Cookies() {
@@ -166,18 +170,18 @@ func ScrapeURL(response http.Response, value string) {
 	}
 
 	ParseHTMLPage(string(body))
+	return nil
 }
 
 func SendRequests(value string) *http.Response {
 
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", value, nil)
-    request.Header.Set("User-Agent", RandomUserAgents())
-
+	request.Header.Set("User-Agent", RandomUserAgents())
+	ParseRequest(*request)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	response, err := client.Do(request)
 
 	if err != nil {
