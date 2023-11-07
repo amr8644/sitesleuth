@@ -16,8 +16,8 @@ type Data struct {
 	HTML    string
 	Headers map[string][]string
 	Cookies map[string]string
-	Meta    map[string]string
-	Script  map[string]string
+	Meta    []string
+	Script  []string
 }
 
 var data Data
@@ -89,7 +89,6 @@ func ParseHTMLPage(page string) {
 	if err != nil {
 		panic(err)
 	}
-
 	// Find nodes
 	var meta, scripts []string
 
@@ -101,14 +100,16 @@ func ParseHTMLPage(page string) {
 			scripts = append(scripts, GetAttr(n, "src"))
 		}
 	})
+
+	data.Meta = meta
+	data.Script = scripts
 	// Print results
-	//fmt.Println("Meta:", meta)
-	//fmt.Println("Scripts:", scripts)
 }
 
 func ParseResponse(response http.Response) {
 	headers := response.Header
 	for k, v := range headers {
+
 		if k == "Set-Cookie" {
 			data.Cookies = make(map[string]string)
 			data.Cookies[k] = v[0]
@@ -123,6 +124,7 @@ func ParseResponse(response http.Response) {
 func ParseRequest(request http.Request) {
 
 	headers := request.Header
+
 	for k, v := range headers {
 		if k == "Set-Cookie" {
 			data.Cookies = make(map[string]string)
@@ -131,13 +133,14 @@ func ParseRequest(request http.Request) {
 		} else {
 			data.Headers = make(map[string][]string)
 			data.Headers[k] = v
+			fmt.Println(k, v)
 		}
 	}
 }
 
 func ScrapeURL(value string) error {
 	response := SendRequests(value)
-	headers := response.Header
+	//headers := response.Header
 
 	var ct string = response.Header.Get("Content-Type")
 
@@ -155,19 +158,7 @@ func ScrapeURL(value string) error {
 	//data.URL = value
 	data.HTML = string(body)
 
-	for k, v := range headers {
-		data.Headers = make(map[string][]string)
-		//fmt.Println(k,v)
-		for _, x := range v {
-
-			data.Headers[k] = append(data.Headers[k], x)
-		}
-	}
-
-	for _, cookie := range response.Cookies() {
-		data.Cookies = make(map[string]string)
-		data.Cookies[cookie.Name] = cookie.Value
-	}
+	ParseResponse(*response)
 
 	ParseHTMLPage(string(body))
 	return nil
@@ -179,9 +170,11 @@ func SendRequests(value string) *http.Response {
 	request, err := http.NewRequest("GET", value, nil)
 	request.Header.Set("User-Agent", RandomUserAgents())
 	ParseRequest(*request)
+
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	response, err := client.Do(request)
 
 	if err != nil {

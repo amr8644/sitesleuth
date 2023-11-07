@@ -3,4 +3,4 @@
 
 
 
-go run main.go target.go utils.go
+go run main.go sitesleuth.go check.go target.go utils.go
