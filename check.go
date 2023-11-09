@@ -8,59 +8,47 @@ import (
 	"regexp"
 )
 
-
 var result map[string]interface{}
 
-func ConvertGolang(key string) []string {
+func ConvertGolang(key string) string {
 
-	var n_p []string
-	pattern := `"` + key + `"\s*:\s*"(.*?)"`
+	escapedValue := regexp.QuoteMeta(key)
+	htmlPattern := `(?s)` + escapedValue
+	fmt.Println(htmlPattern+"\n")
 
-	re := regexp.MustCompile(pattern)
+	return htmlPattern
+}
 
-	matches := re.FindAllStringSubmatch(ReadFile(), -1)
+func CheckHTML(html string) []string {
 
-	if len(matches) == 0 {
-		fmt.Println("Key not found in JSON file.")
-	}
-
-	var values []string
-	for _, match := range matches {
-		if len(match) >= 2 {
-			values = append(values, match[1]) // match[1] contains the captured value
+    var regexes []string
+	for name, info := range result {
+		data, ok := info.(map[string]interface{})
+		if !ok {
+			fmt.Println("Invalid data format for app:", name)
+			continue
+		}
+		for _, v := range data {
+			d := v.(map[string]interface{})
+			if array, ok := d["html"].([]interface{}); ok {
+				for _, value := range array {
+					if str, ok := value.(string); ok {
+                       regexes =append(regexes, ConvertGolang(str))
+					}
+				}
+			}
 		}
 	}
-
-	for _, v := range values {
-		escapedValue := regexp.QuoteMeta(v)
-		htmlPattern := `(?s)` + escapedValue
-		fmt.Println(htmlPattern)
-		n_p = append(n_p, htmlPattern)
-	}
-
-	return n_p
+    return regexes
 }
 
-func CheckHTML(html string) {
-
-
-	var ans []string
-	re := ConvertGolang("script")
-
-	for _, v := range re {
-        fmt.Println(v)
-		r := regexp.MustCompile(v)
-		ans = r.FindStringSubmatch(html)
-		fmt.Println(ans)
-	}
-}
 
 func ReadFile() {
 
 	file, err := os.Open("apps.json")
 	if err != nil {
 		fmt.Println("Error opening JSON file:", err)
-		return 
+		return
 	}
 	defer file.Close()
 
@@ -73,8 +61,7 @@ func ReadFile() {
 		fmt.Println("Error reading JSON file:", err)
 		return
 	}
-
-    // Unmarshal the JSON data into a map
+	// Unmarshal the JSON data into a map
 	err = json.Unmarshal(content, &result)
 	if err != nil {
 		panic(err)
