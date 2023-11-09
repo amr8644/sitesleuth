@@ -14,14 +14,12 @@ func ConvertGolang(key string) string {
 
 	escapedValue := regexp.QuoteMeta(key)
 	htmlPattern := `(?s)` + escapedValue
-	fmt.Println(htmlPattern+"\n")
 
 	return htmlPattern
 }
 
-func CheckHTML(html string) []string {
+func CheckHTML(html string) {
 
-    var regexes []string
 	for name, info := range result {
 		data, ok := info.(map[string]interface{})
 		if !ok {
@@ -30,18 +28,62 @@ func CheckHTML(html string) []string {
 		}
 		for _, v := range data {
 			d := v.(map[string]interface{})
+
 			if array, ok := d["html"].([]interface{}); ok {
 				for _, value := range array {
 					if str, ok := value.(string); ok {
-                       regexes =append(regexes, ConvertGolang(str))
+						regexes := ConvertGolang(str)
+						matched, err := regexp.MatchString(regexes, html)
+						if err != nil {
+							fmt.Println("Error:", err)
+							return
+						}
+						if matched {
+							fmt.Println(d["name"])
+						}
 					}
 				}
 			}
 		}
 	}
-    return regexes
 }
+func CheckScripts(scripts []string) {
 
+	var regexes []string
+	for name, info := range result {
+		data, ok := info.(map[string]interface{})
+		if !ok {
+			fmt.Println("Invalid data format for app:", name)
+			continue
+		}
+		for _, v := range data {
+			d := v.(map[string]interface{})
+			if array, ok := d["script"].([]interface{}); ok {
+				for _, value := range array {
+					if str, ok := value.(string); ok {
+						regexes = append(regexes, ConvertGolang(str))
+					}
+				}
+			}
+		}
+	}
+
+	for _, ss := range scripts {
+		for _, r := range regexes {
+
+        fmt.Println(ss)
+			matched, err := regexp.MatchString(r, ss)
+			if err != nil {
+				fmt.Println("Error:", err)
+				return
+			}
+			if matched {
+				fmt.Println("true")
+			}
+		}
+
+	}
+}
 
 func ReadFile() {
 

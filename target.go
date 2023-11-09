@@ -1,6 +1,7 @@
 package main
 
 import (
+    "time"
 	"errors"
 	"fmt"
 	"io"
@@ -164,7 +165,9 @@ func ScrapeURL(value string) error {
 
 func SendRequests(value string) *http.Response {
 
-	client := &http.Client{}
+	client := &http.Client{
+ Timeout: 30 * time.Second, 
+    }
 	request, err := http.NewRequest("GET", value, nil)
 	request.Header.Set("User-Agent", RandomUserAgents())
 	ParseRequest(*request)

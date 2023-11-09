@@ -5,6 +5,7 @@ func Start() {
 	ScrapeURL(tar)
     ReadFile()
 	CheckHTML(data.HTML)
+    CheckScripts(data.Script)
 
 
 }

@@ -1,5 +1,4 @@
 {
-  "$schema": "../schema.json",
   "apps": {
     "1C-Bitrix": {
       "cats": [
