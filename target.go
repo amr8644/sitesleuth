@@ -129,11 +129,9 @@ func ParseRequest(request http.Request) {
 		if k == "Set-Cookie" {
 			data.Cookies = make(map[string]string)
 			data.Cookies[k] = v[0]
-			fmt.Println(k, v)
 		} else {
 			data.Headers = make(map[string][]string)
 			data.Headers[k] = v
-			fmt.Println(k, v)
 		}
 	}
 }

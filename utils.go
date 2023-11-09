@@ -8,7 +8,6 @@ import (
 
 	"golang.org/x/net/html"
 )
-
 func GetAttr(n *html.Node, attr string) string {
 	for _, a := range n.Attr {
 		if a.Key == attr {
@@ -52,5 +51,5 @@ func RandomUserAgents() string {
 	// Pick random line
 	r := rand.Intn(len(lines))
 
-    return lines[r]
+	return lines[r]
 }
