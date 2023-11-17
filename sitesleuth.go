@@ -7,5 +7,4 @@ func Start() {
 	CheckHTML(data.HTML)
     CheckScripts(data.Script)
 
-
 }

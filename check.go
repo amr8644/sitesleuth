@@ -108,5 +108,4 @@ func ReadFile() {
 	if err != nil {
 		panic(err)
 	}
-
 }
