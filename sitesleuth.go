@@ -3,8 +3,8 @@ package main
 func Start() {
 	tar := "https://www.shielder.com"
 	ScrapeURL(tar)
-    ReadFile()
-	CheckHTML(data.HTML)
-    CheckScripts(data.Script)
+   ReadFile()
+//	CheckHTML(data.HTML)
+   // CheckScripts(data.Script)
 
 }
