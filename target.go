@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -27,7 +26,6 @@ func PrintData() {
 
 	fmt.Println("URL:", data.URL)
 
-	//fmt.Println("HTML:", data.HTML)
 
 	fmt.Println("Headers:")
 	for k, v := range data.Headers {
@@ -49,6 +47,9 @@ func PrintData() {
 	for k, v := range data.Script {
 		fmt.Println("- ", k, ":", v)
 	}
+
+
+	//fmt.Println("HTML:", data.HTML)
 
 }
 
@@ -110,7 +111,6 @@ func ParseHTMLPage(page string) {
 func ParseResponse(response http.Response) {
 	headers := response.Header
 	for k, v := range headers {
-
 		if k == "Set-Cookie" {
 			data.Cookies = make(map[string]string)
 			data.Cookies[k] = v[0]
@@ -123,9 +123,7 @@ func ParseResponse(response http.Response) {
 }
 
 func ParseRequest(request http.Request) {
-
 	headers := request.Header
-
 	for k, v := range headers {
 		if k == "Set-Cookie" {
 			data.Cookies = make(map[string]string)
@@ -137,30 +135,22 @@ func ParseRequest(request http.Request) {
 	}
 }
 
-func ScrapeURL(value string) error {
+func ScrapeURL(value string) (error,http.Response) {
 	response := SendRequests(value)
 	//headers := response.Header
-
-	var ct string = response.Header.Get("Content-Type")
-
-	if ct == "" || ct != "text/html" {
-		log.Println("{} response use Content-Type {} but text/html is needed")
-		return errors.New("Invalid Content-Type")
-	}
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Fatalln(err)
-		return err
 	}
 
 	//data.URL = value
 	data.HTML = string(body)
 
 	ParseResponse(*response)
-
 	ParseHTMLPage(string(body))
-	return nil
+
+	return nil,*response
 }
 
 func SendRequests(value string) *http.Response {
@@ -171,7 +161,6 @@ func SendRequests(value string) *http.Response {
 
 	request, err := http.NewRequest("GET", value, nil)
 	request.Header.Set("User-Agent", RandomUserAgents())
-	ParseRequest(*request)
 
 	if err != nil {
 		log.Fatalln(err)

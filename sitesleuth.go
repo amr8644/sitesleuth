@@ -1,10 +1,11 @@
 package main
 
-func Start() {
-	tar := "https://www.shielder.com"
-	ScrapeURL(tar)
-   ReadFile()
-//	CheckHTML(data.HTML)
-   // CheckScripts(data.Script)
 
+func Start() {
+	//tar := "https://10minutemail.net/"
+	ReadFile()
+	//CheckHTML(data.HTML)
+	CheckScripts(data.Script)
+
+	//PrintData()
 }
