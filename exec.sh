@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/zsh
 
-go run main.go sitesleuth.go check.go target.go utils.go apps.go
+go run main.go sitesleuth.go check.go target.go utils.go data.go

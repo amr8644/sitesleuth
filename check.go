@@ -1,70 +1,63 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"os"
+	"log"
 	"regexp"
+	"strings"
 )
 
-var result map[string]map[string]interface{}
-
 func ConvertGolang(key string) string {
+	splitted := strings.Split(key, "\\;")
+	if len(splitted) == 0 {
+		log.Fatalln("Error")
+	}
 
-	escapedValue := regexp.QuoteMeta(key)
-	htmlPattern := `(?s)` + escapedValue
+	return splitted[0]
 
-	return htmlPattern
 }
-
 func CheckHTML(html string) {
 
-}
+	if apps, ok := apps["apps"].(map[string]interface{}); ok {
+		for _, app := range apps {
+			if appMap, ok := app.(map[string]interface{}); ok {
+				if regexes, ok := appMap["html"].([]interface{}); ok {
+					for _, regex := range regexes {
+						if r, ok := regex.(string); ok {
+							re := regexp.MustCompile(ConvertGolang(r))
 
-
-func CheckScripts(scripts []string) {
-	for _, appData := range result["apps"] {
-		if appDataMap, ok := appData.(map[string]interface{}); ok {
-			if scriptValue, ok := appDataMap["script"].(string); ok {
-
-			} else {
-				continue
+							m := re.FindAllStringSubmatch(html, -1)
+							if len(m) != 0 {
+								fmt.Println(m)
+							}
+						}
+					}
+				}
 			}
-		} else {
-			fmt.Println("Invalid appData format.")
 		}
 	}
 }
 
-func ReadFile() {
+func CheckScripts(script string) {
 
-	file, err := os.Open("apps.json")
-
-	if err != nil {
-		fmt.Println("Error opening JSON file:", err)
-		return
+	if apps, ok := apps["apps"].(map[string]interface{}); ok {
+		for _, app := range apps {
+			if appMap, ok := app.(map[string]interface{}); ok {
+				if scriptSrc, ok := appMap["scriptSrc"].([]interface{}); ok {
+					for _, src := range scriptSrc {
+						if srcStr, ok := src.(string); ok {
+							re, err := regexp.Compile(ConvertGolang(srcStr))
+							if err != nil {
+								fmt.Println(err)
+							}
+							m := re.FindAllStringSubmatch(script, -1)
+							if len(m) != 0 {
+								fmt.Println(m)
+							}
+						}
+					}
+				}
+			}
+		}
 	}
-	defer file.Close()
-
-	if err != nil {
-		fmt.Println("Error decoding JSON:", err)
-		return
-	}
-	content, err := io.ReadAll(file)
-	if err != nil {
-		fmt.Println("Error reading JSON file:", err)
-		return
-	}
-	// Unmarshal the JSON data into a map
-	err = json.Unmarshal(content, &result)
-	if err != nil {
-		panic(err)
-	}
-
-}
-
-type App struct {
-	Script string `json:"script"`
 }

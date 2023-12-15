@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
+	"sync"
 
 	"golang.org/x/net/html"
 )
@@ -25,7 +25,6 @@ var data Data
 func PrintData() {
 
 	fmt.Println("URL:", data.URL)
-
 
 	fmt.Println("Headers:")
 	for k, v := range data.Headers {
@@ -47,7 +46,6 @@ func PrintData() {
 	for k, v := range data.Script {
 		fmt.Println("- ", k, ":", v)
 	}
-
 
 	//fmt.Println("HTML:", data.HTML)
 
@@ -85,13 +83,11 @@ func LinkGrabber(value string) []string {
 }
 
 func ParseHTMLPage(page string) {
-	// Parse HTML
 	doc, err := html.Parse(strings.NewReader(data.HTML))
 
 	if err != nil {
 		panic(err)
 	}
-	// Find nodes
 	var meta, scripts []string
 
 	IterateNodes(doc, func(n *html.Node) {
@@ -105,7 +101,6 @@ func ParseHTMLPage(page string) {
 
 	data.Meta = meta
 	data.Script = scripts
-	// Print results
 }
 
 func ParseResponse(response http.Response) {
@@ -137,26 +132,33 @@ func ParseRequest(request http.Request) {
 
 func ScrapeURL(value string) (error,http.Response) {
 	response := SendRequests(value)
-	//headers := response.Header
-
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	//data.URL = value
 	data.HTML = string(body)
 
-	ParseResponse(*response)
-	ParseHTMLPage(string(body))
+	var wg sync.WaitGroup
 
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+	    ParseResponse(*response)
+	}()
+
+	go func() {
+		defer wg.Done() 
+	    ParseHTMLPage(string(body))
+	}()
+
+	wg.Wait()
 	return nil,*response
 }
 
 func SendRequests(value string) *http.Response {
 
 	client := &http.Client{
-		Timeout: 30 * time.Second,
 	}
 
 	request, err := http.NewRequest("GET", value, nil)
@@ -171,6 +173,5 @@ func SendRequests(value string) *http.Response {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	return response
 }

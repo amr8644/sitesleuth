@@ -18,7 +18,6 @@ func GetAttr(n *html.Node, attr string) string {
 	return ""
 }
 
-// Iterate DOM nodes
 func IterateNodes(n *html.Node, f func(*html.Node)) {
 	f(n)
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -28,7 +27,6 @@ func IterateNodes(n *html.Node, f func(*html.Node)) {
 
 func RandomUserAgents() string {
 
-	// Open file
 	file, err := os.Open("user-agent.txt")
 
 	if err != nil {
@@ -37,19 +35,16 @@ func RandomUserAgents() string {
 
 	defer file.Close()
 
-	// Read lines
 	scanner := bufio.NewScanner(file)
 	var lines []string
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
 
-	// Check lines were read
 	if len(lines) == 0 {
 		fmt.Println("File is empty")
 	}
 
-	// Pick random line
 	r := rand.Intn(len(lines))
 
 	return lines[r]
